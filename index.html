@@ -1,151 +1,171 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Calculator</title>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>餐饮投资计算器</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:Calibri,sans-serif;background:#f0f2f5;color:#333;padding:12px}
-.container{max-width:500px;margin:0 自动}
+.container{max-width:500px;margin:0 auto}
 .card{background:#fff;border-radius:14px;box-shadow:0 1px 8px rgba(0,0,0,0.07);padding:20px;margin-bottom:14px}
-h1{font-size:20px;color:#0B2545;margin-bottom:2px}
+h1{font-size:20px;color:#0B2545}
 .sub{color:#888;font-size:12px;margin-bottom:16px}
 .field{margin-bottom:12px}
 label{display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:4px}
-input{width:100%;padding:12px;border:1.5px solid #ddd;border-radius:10px;font-size:16px}
-input:focus{border-color:#2E74B5;outline:none}
-.row-btns{display:flex;gap:10px;margin-top:4px}
-button{flex:1;padding:13px;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer}
+input{width:100%;padding:12px;border:1.5px solid #ddd;border-radius:10px;font-size:16px;outline:none}
+input:focus{border-color:#2E74B5;box-shadow:0 0 0 3px rgba(46,116,181,0.15)}
+.row{display:flex;gap:10px;margin:10px 0}
+.btn{flex:1;padding:13px;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer}
 .btn-primary{background:#2E74B5;color:#fff}
 .btn-primary:active{background:#1a5a8a}
-.btn-outline{background:#f0f4f8;color:#555;font-size:13px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.btn-gray{background:#f0f4f8;color:#555}
+.presets{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.preset{padding:6px 14px;border:1.5px solid #ddd;border-radius:20px;font-size:12px;cursor:pointer;background:#fff}
+.preset:active{background:#e8eef5}
+.badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;margin:8px 0}
+.low{background:#e8f5e9;color:#2e7d32}
+.mid{background:#fff3e0;color:#e65100}
+.high{background:#fce4ec;color:#c62828}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .stat{background:#f8f9fb;border-radius:10px;padding:12px 8px;text-align:center}
 .stat .v{font-size:20px;font-weight:700;color:#0B2545}
 .stat .l{font-size:11px;color:#888;margin-top:2px}
-.stat.highlight{background:#e8eef5;border:1.5px solid #2E74B5}
-.stat.highlight .v{color:#c62828}
-.section-title{font-size:14px;font-weight:600;color:#0B2545;margin:14px 0 6px}
-.steps{background:#f8f9fb;border-radius:10px;padding:12px;font-size:12px;line-height:1.9;margin-top:8px}
+.total{border:2px solid #2E74B5;background:#e8eef5}
+.total .v{color:#c62828;font-size:22px}
+.stitle{font-size:14px;font-weight:600;color:#0B2545;margin:14px 0 6px}
+.steps{background:#f8f9fb;border-radius:10px;padding:12px;font-size:12px;line-height:2;margin-top:8px}
 table{width:100%;border-collapse:collapse;margin-top:8px;font-size:12px}
-th{background:#2E74B5;color:#fff;padding:8px;font-weight:600;font-size:11px}
+th{background:#2E74B5;color:#fff;padding:8px;text-align:left}
 td{padding:6px 8px;border-bottom:1px solid #eee}
 tr:nth-child(even) td{background:#f8f9fb}
-.num{text-align:right}
-.bar-wrap{height:14px;background:#eee;border-radius:4px;overflow:hidden}
-.bar{height:14px;background:#2E74B5}
-.footnote{font-size:11px;color:#999;margin-top:12px}
-.presets{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
-.preset-btn{padding:6px 14px;border:1.5px solid #ddd;border-radius:20px;font-size:12px;cursor:pointer}
-footer{text-align:center;font-size:12px;color:#888;padding:20px 0}
+.r{text-align:right}
+.bar{height:14px;background:#2E74B5;border-radius:4px}
+.bw{height:14px;background:#eee;border-radius:4px;overflow:hidden}
+.ft{text-align:center;font-size:12px;color:#888;padding:20px 0}
 </style>
-</head><body>
+</head>
+<body>
 <div class="container">
 <div class="card">
 <h1>餐饮投资计算器</h1>
-<div class="sub">输入客单价反推投资总额</div>
-<div class="field"><label>人均消费（EUR）</label><input type="number" id="price" value="40" min="5" max="500" step="1"></div>
-<div class="field"><label>餐厅面积（㎡）</label><input type="number" id="area" placeholder="自动" min="10" max="5000" step="10"></div>
-<div class="row-btns">
-<button class="btn-primary" onclick="calc()">计算</button>
-<button class="btn-outline" onclick="resetForm()">清空</button>
+<div class="sub">输入客单价和面积,自动反推投资总额</div>
+<div class="presets" id="presets"></div>
+<div class="field"><label>人均消费 (EUR)</label><input type="number" id="price" value="40" min="5" max="500" step="1"></div>
+<div class="field"><label>餐厅面积 (sqm - 留空自动)</label><input type="number" id="area" min="10" max="5000" step="10"></div>
+<div class="row">
+<button class="btn btn-primary" onclick="calc()">计算</button>
+<button class="btn btn-gray" onclick="resetForm()">清空</button>
 </div>
 <div id="badgeRow"></div>
 </div>
 <div class="card" id="resultCard" style="display:none">
-<div class="grid" id="overviewGrid"></div>
-<div class="section-title">计算步骤</div>
-<div class="steps" id="stepsDiv"></div>
-<div class="section-title">资金分配明细</div>
-<table><thead><tr><th>投入板块</th><th>%</th><th class="num">金额</th><th></th></tr></thead>
+<div class="grid" id="overview"></div>
+<div class="stitle">推算过程</div>
+<div class="steps" id="steps"></div>
+<div class="stitle">资金分配</div>
+<table><thead><tr><th>项目</th><th style="text-align:center">%</th><th class="r">金额</th><th></th></tr></thead>
 <tbody id="investBody"></tbody></table>
+<div class="ft">作者餐饮设计师高翔 · 联系方式: 15090575676</div>
 </div>
-<footer>作者餐饮设计师高翔 · 联系方式：15090575676</footer>
 </div>
 <script>
-var MODELS = {
-low:{label:"低档 - Fast Casual",cls:"low",range:[5,25],defArea:80,dPct:0.58,sDen:1.7,turn:3.0,oW:0.60,oE:0.80,marg:0.16,pay:15,
+var MODELS={
+low:{label:"低档",cls:"low",range:[5,25],defArea:80,dPct:0.58,sDen:1.7,turn:3.0,oW:0.60,oE:0.80,marg:0.16,pay:15,
 inv:[{n:"硬装施工",p:42},{n:"厨房设备",p:20},{n:"家具软装",p:12},{n:"暖通空调",p:10},{n:"消防安防",p:6},{n:"设计费",p:4},{n:"许可法律",p:4},{n:"开办费",p:5},{n:"智能设备",p:3}]},
-mid:{label:"中档 - Bistro/Brasserie",cls:"mid",range:[25,65],defArea:150,dPct:0.52,sDen:2.3,turn:2.0,oW:0.65,oE:0.85,marg:0.20,pay:24,
+mid:{label:"中档",cls:"mid",range:[25,65],defArea:150,dPct:0.52,sDen:2.3,turn:2.0,oW:0.65,oE:0.85,marg:0.20,pay:24,
 inv:[{n:"硬装施工",p:37},{n:"厨房设备",p:17},{n:"家具软装",p:15},{n:"灯光音响",p:4},{n:"暖通空调",p:11},{n:"消防安防",p:6},{n:"设计费",p:9},{n:"许可法律",p:4},{n:"开办费",p:6},{n:"智能设备",p:4}]},
-high:{label:"高档 - Fine Dining",cls:"high",range:[65,999],defArea:260,dPct:0.48,sDen:3.5,turn:1.5,oW:0.55,oE:0.80,marg:0.22,pay:30,
+high:{label:"高档",cls:"high",range:[65,999],defArea:260,dPct:0.48,sDen:3.5,turn:1.5,oW:0.55,oE:0.80,marg:0.22,pay:30,
 inv:[{n:"硬装施工",p:32},{n:"厨房设备",p:14},{n:"家具软装",p:22},{n:"灯光音响",p:7},{n:"暖通空调",p:11},{n:"消防安防",p:6},{n:"设计费",p:12},{n:"许可法律",p:2},{n:"开办费",p:6},{n:"智能设备",p:4}]}
 };
 
-function getM(p){for(var k in MODELS){var m=MODELS[k];if(p>=m.range[0]&&p<=m.range[1])return m}return MODELS.high}
-function fm(n){return Math.round(n).toLocaleString()+" EUR"}
-function setPreset(p,a){document.getElementById("price").value=p;document.getElementById("area").value=a;calc()}
-function resetForm(){document.getElementById("price").value=40;document.getElementById("area").value="";document.getElementById("resultCard").style.display="none";document.getElementById("badgeRow").innerHTML=""}
-function calc(){
-var p=parseFloat(document.getElementById("price").value)||40;
-var aI=document.getElementById("area").value;
-var m=getM(p);
-var a=aI?parseFloat(aI):m.defArea;
-var dA=a*m.dPct;
-var s=Math.floor(dA/m.sDen);
-var bS=m.pay>=24?4:0;
-var tS=s+bS;
-var dW=Math.round(tS*m.turn*m.oW);
-var dE=Math.round(tS*m.turn*m.oE);
-var mC=Math.round(dW*22+dE*8);
-var mR=mC*p;
-var mP=mR*m.marg;
-var tI=Math.round(mP*m.pay);
-var pS=Math.round(tI/a);
-var tier=document.getElementById("badgeRow");
-tier.innerHTML="<span class=\"badge "+m.cls+"\">"+m.label+"</span>";
-var card=document.getElementById("resultCard");
-card.style.display="block";
-document.getElementById("overviewGrid").innerHTML=
-"<div class=\"stat\"><div class=\"v\">"+a+"</div><div class=\"l\">面积</div></div>"+
-"<div class=\"stat\"><div class=\"v\">"+tS+"</div><div class=\"l\">座位</div></div>"+
-"<div class=\"stat\"><div class=\"v\">"+mC.toLocaleString()+"</div><div class=\"l\">月客流</div></div>"+
-"<div class=\"stat\"><div class=\"v\">"+fm(mR)+"</div><div class=\"l\">月营收</div></div>"+
-"<div class=\"stat\"><div class=\"v\">"+fm(mP)+"</div><div class=\"l\">月净利</div></div>"+
-"<div class=\"stat highlight\"><div class=\"v\">"+fm(tI)+"</div><div class=\"l\">总投资</div></div>"+
-"<div class=\"stat\"><div class=\"v\">"+pS.toLocaleString()+" EUR</div><div class=\"l\">单价</div></div>"+
-"<div class=\"stat\"><div class=\"v\">"+m.pay+"月</div><div class=\"l\">回本周期</div></div>";
-var tb="";
-for(var i=0;i<m.inv.length;i++){var it=m.inv[i];var amt=Math.round(tI*it.p/100);
-tb+="<tr><td>"+it.n+"</td><td style=\"text-align:center\">"+it.p+"%</td><td class=\"num\">"+fm(amt)+"</td><td><div class=\"bar-wrap\"><div class=\"bar\" style=\"width:"+(it.p*2.5)+"px\"></div></div></td></tr>";}
-tb+="<tr style=\"font-weight:700;background:#e8eef5\"><td>合计</td><td style=\"text-align:center\">100%</td><td class=\"num\">"+fm(tI)+"</td><td></td></tr>";
-document.getElementById("investBody").innerHTML=tb;
-document.getElementById("stepsDiv").innerHTML=
-"<div>1. 就餐区 = "+a+" x "+(m.dPct*100).toFixed(0)+"% = <b>"+dA.toFixed(1)+"</b></div>"+
-"<div>2. 座位 = "+dA.toFixed(1)+" / "+m.sDen+" + 吧台"+bS+"座 = <b>"+tS+"座</b></div>"+
-"<div>3. 日均客流 = "+tS+"座 x "+m.turn+"次 = 平日"+dW+"人/周末"+dE+"人</div>"+
-"<div>4. 月营收 = "+mC.toLocaleString()+"人 x EUR "+p+" = <span class=\"hl\">"+fm(mR)+"</span></div>"+
-"<div>5. 月净利 = "+fm(mR)+" x "+(m.marg*100).toFixed(0)+"% = <span class=\"hl\">"+fm(mP)+"</span></div>"+
-"<div><b>6. 总投资 = "+fm(mP)+" x "+m.pay+"月 = <span class=\"big\">"+fm(tI)+"</span></b></div>"+
-"<div>7. 单价 = "+fm(tI)+" / "+a+" = <b>"+pS.toLocaleString()+" EUR</b></div>";}
-calc();
-</script>
-<div class="stat"><div class="v">\u20ac'+pS.toLocaleString()+'</div><div class="l">\u33a1造价</div></div>'+
-
-'<div class="stat"><div class="v">'+m.pay+'月</div><div class="l">回本周期</div></div>';
-
-document.getElementById('stepsDiv').innerHTML=
-
-'<div>1. 就餐区 = '+a+'\u33a1 x '+(m.dPct*100).toFixed(0)+'% = <b>'+dA.toFixed(1)+'\u33a1</b></div>'+
-
-'<div>2. 座位 = '+dA.toFixed(1)+'\u33a1 \u00f7 '+m.sDen+'\u33a1/座 + 吧台'+bS+'座 = <b>'+tS+'座</b></div>'+
-
-'<div>3. 日均客流 = '+tS+'座 x '+m.turn+'次 = 平日'+Math.round(dW)+'人/周末'+Math.round(dE)+'人</div>'+
-
-'<div>4. 月营收 = '+mC.toLocaleString()+'人 x \u20ac'+p+' = <span class="hl">'+fm(mR)+'</span></div>'+
-
-'<div>5. 月净利 = '+fm(mR)+' x '+(m.marg*100).toFixed(0)+'% = <span class="hl">'+fm(mP)+'</span></div>'+
-
-'<div><b>6. 总投资 = '+fm(mP)+' x '+m.pay+'月 = <span class="big">'+fm(tI)+'</span></b></div>'+
-
-'<div>7. 单价 = '+fm(tI)+' / '+a+'\u33a1 = <b>\u20ac'+pS.toLocaleString()+'/\u33a1</b></div>';
-
-var tb='';for(var i=0;i<m.inv.length;i++){var it=m.inv[i],amt=Math.round(tI*it.p/100);
-
-tb+='<tr><td>'+it.n+'</td><td style="text-align:center">'+it.p+'%</td><td class="num">'+fm(amt)+'</td>'+
-
-'<td><div class="bar-wrap"><div class="bar" style="width:'+(it.p*2.5)+'px"></div></div></td></tr>'}
-
-tb+='<tr style="font-weight:700;background:#e8eef5"><td>合计</td><td style="text-align:center">100%</td><td class="num">'+fm(tI)+'</td><td></td></tr>';
-
-document.getElementById('investBody').innerHTML=tb;
-
+function getM(p){
+  for(var k in MODELS){
+    var m=MODELS[k];
+    if(p>=m.range[0]&&p<=m.range[1])return m;
+  }
+  return MODELS.high;
 }
-calc();</script>
-</body></html>
+
+function fm(n){
+  return Math.round(n).toLocaleString()+" EUR";
+}
+
+function setP(p,a){
+  document.getElementById('price').value=p;
+  document.getElementById('area').value=a;
+  calc();
+}
+
+function resetForm(){
+  document.getElementById('price').value=40;
+  document.getElementById('area').value='';
+  document.getElementById('resultCard').style.display='none';
+  document.getElementById('badgeRow').innerHTML='';
+}
+
+function calc(){
+  var p=parseFloat(document.getElementById('price').value)||40;
+  var m=getM(p);
+  var aI=document.getElementById('area').value;
+  var a=aI?parseFloat(aI):m.defArea;
+  var dA=a*m.dPct;
+  var s=Math.floor(dA/m.sDen);
+  var bS=m.pay>=24?4:0;
+  var tS=s+bS;
+  var dW=Math.round(tS*m.turn*m.oW);
+  var dE=Math.round(tS*m.turn*m.oE);
+  var mC=Math.round(dW*22+dE*8);
+  var mR=mC*p;
+  var mP=mR*m.marg;
+  var tI=Math.round(mP*m.pay);
+  var pS=Math.round(tI/a);
+  
+  document.getElementById('badgeRow').innerHTML='<span class="badge '+m.cls+'">'+m.label+'</span>';
+  document.getElementById('resultCard').style.display='block';
+  
+  document.getElementById('overview').innerHTML=
+    '<div class="stat"><div class="v">'+a+'</div><div class="l">面积</div></div>'+
+    '<div class="stat"><div class="v">'+tS+'</div><div class="l">座位</div></div>'+
+    '<div class="stat"><div class="v">'+mC.toLocaleString()+'</div><div class="l">月客流</div></div>'+
+    '<div class="stat"><div class="v">'+fm(mR)+'</div><div class="l">月营收</div></div>'+
+    '<div class="stat"><div class="v">'+fm(mP)+'</div><div class="l">月净利</div></div>'+
+    '<div class="stat total"><div class="v">'+fm(tI)+'</div><div class="l">总投资</div></div>'+
+    '<div class="stat"><div class="v">'+pS.toLocaleString()+'</div><div class="l">单价</div></div>'+
+    '<div class="stat"><div class="v">'+m.pay+'月</div><div class="l">回本周期</div></div>';
+  
+  var tb='';
+  for(var i=0;i<m.inv.length;i++){
+    var it=m.inv[i];
+    var amt=Math.round(tI*it.p/100);
+    tb+='<tr><td>'+it.n+'</td><td style="text-align:center">'+it.p+'%</td><td class="r">'+fm(amt)+'</td><td><div class="bw"><div class="bar" style="width:'+(it.p*2.5)+'px"></div></div></td></tr>';
+  }
+  tb+='<tr style="font-weight:700;background:#e8eef5"><td>合计</td><td style="text-align:center">100%</td><td class="r">'+fm(tI)+'</td><td></td></tr>';
+  document.getElementById('investBody').innerHTML=tb;
+  
+  document.getElementById('steps').innerHTML=
+    '<div>1. 就餐区 = '+a+' sqm x '+(m.dPct*100).toFixed(0)+'% = <b>'+dA.toFixed(1)+' sqm</b></div>'+
+    '<div>2. 座位 = '+dA.toFixed(1)+' sqm / '+m.sDen+' + 吧台'+bS+' = <b>'+tS+'座</b></div>'+
+    '<div>3. 客流 = '+tS+'座 x '+m.turn+'次 = 平日'+dW+'人/周末'+dE+'人</div>'+
+    '<div>4. 月营收 = '+mC.toLocaleString()+' x EUR'+p+' = '+fm(mR)+'</div>'+
+    '<div>5. 月净利 = '+fm(mR)+' x '+(m.marg*100).toFixed(0)+'% = '+fm(mP)+'</div>'+
+    '<div><b>6. 总投资 = '+fm(mP)+' x '+m.pay+'月 = '+fm(tI)+'</b></div>'+
+    '<div>7. 单价 = '+fm(tI)+' / '+a+' sqm = '+pS.toLocaleString()+' EUR</div>';
+}
+
+// Setup preset buttons
+(function(){
+  var b=document.getElementById('presets');
+  var pre=[{p:15,a:'',l:'低档 EUR15'},{p:40,a:'',l:'中档 EUR40'},{p:120,a:'',l:'高档 EUR120'},{p:40,a:'150',l:'Bistro 150sqm'}];
+  for(var i=0;i<pre.length;i++){
+    var btn=document.createElement('button');
+    btn.className='preset';
+    btn.onclick=new Function('setP('+pre[i].p+',"'+pre[i].a+'")');
+    btn.textContent=pre[i].l;
+    b.appendChild(btn);
+  }
+  calc();
+})();
+</script>
+</body>
+</html>
