@@ -2,7 +2,7 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:Calibri,sans-serif;background:#f0f2f5;color:#333;padding:12px}
-.container{max-width:500px;margin:0 auto}
+.container{max-width:500px;margin:0 自动}
 .card{background:#fff;border-radius:14px;box-shadow:0 1px 8px rgba(0,0,0,0.07);padding:20px;margin-bottom:14px}
 h1{font-size:20px;color:#0B2545;margin-bottom:2px}
 .sub{color:#888;font-size:12px;margin-bottom:16px}
@@ -34,29 +34,35 @@ tr:nth-child(even) td{background:#f8f9fb}
 .presets{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
 .preset-btn{padding:6px 14px;border:1.5px solid #ddd;border-radius:20px;font-size:12px;cursor:pointer}
 footer{text-align:center;font-size:12px;color:#888;padding:20px 0}
+input:focus{border-color:#2E74B5;outline:none;box-shadow:0 0 0 3px rgba(46,116,181,0.15)}
+.badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;margin:4px 6px 4px 0}
+.low{background:#e8f5e9;color:#2e7d32}.mid{background:#fff3e0;color:#e65100}.high{background:#fce4ec;color:#c62828}
+.steps .hl{color:#2E74B5}.steps .big{color:#c62828;font-size:15px;font-weight:700}
+.presets{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.preset-btn{cursor:pointer}
 </style>
 </head><body>
 <div class="container">
 <div class="card">
-<h1>Calculator</h1>
-<div class="sub">Enter per-person spend to calculate investment</div>
-<div class="field"><label>Per-person spend</label><input type="number" id="price" value="40" min="5" max="500" step="1"></div>
-<div class="field"><label>Area (sqm, optional)</label><input type="number" id="area" placeholder="auto" min="10" max="5000" step="10"></div>
+<h1>餐饮投资计算器</h1>
+<div class="sub">输入客单价反推投资总额</div>
+<div class="field"><label>人均消费（€）</label><input type="number" id="price" value="40" min="5" max="500" step="1"></div>
+<div class="field"><label>餐厅面积（㎡）</label><input type="number" id="area" placeholder="自动" min="10" max="5000" step="10"></div>
 <div class="row-btns">
-<button class="btn-primary" onclick="calc()">Calculate</button>
-<button class="btn-outline" onclick="resetForm()">Clear</button>
+<button class="btn-primary" onclick="calc()">计算</button>
+<button class="btn-outline" onclick="resetForm()">清空</button>
 </div>
 <div id="badgeRow"></div>
 </div>
 <div class="card" id="resultCard" style="display:none">
 <div class="grid" id="overviewGrid"></div>
-<div class="section-title">Steps</div>
+<div class="section-title">计算步骤</div>
 <div class="steps" id="stepsDiv"></div>
-<div class="section-title">Investment Breakdown</div>
-<table><thead><tr><th>Category</th><th>%</th><th class="num">Amount</th><th></th></tr></thead>
+<div class="section-title">资金分配明细</div>
+<table><thead><tr><th>投入板块</th><th>%</th><th class="num">金额</th><th></th></tr></thead>
 <tbody id="investBody"></tbody></table>
 </div>
-<footer>Author Contact: 15090575676</footer>
+<footer>作者餐饮设计师高翔 · 联系方式：15090575676</footer>
 </div>
 <script>var MODELS = {
 
