@@ -1,0 +1,396 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.5,user-scalable=yes">
+<title>欧洲餐饮投资计算器</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Calibri,sans-serif;background:#f0f2f5;color:#333;padding:12px}
+.container{max-width:500px;margin:0 auto}
+.card{background:#fff;border-radius:14px;box-shadow:0 1px 8px rgba(0,0,0,0.07);padding:20px;margin-bottom:14px}
+h1{font-size:20px;color:#0B2545;margin-bottom:2px;letter-spacing:-0.3px}
+.sub{color:#888;font-size:12px;margin-bottom:16px}
+.field{margin-bottom:12px}
+label{display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:4px}
+input{width:100%;padding:12px 14px;border:1.5px solid #ddd;border-radius:10px;font-size:16px;-webkit-appearance:none;appearance:none}
+input:focus{border-color:#2E74B5;outline:none;box-shadow:0 0 0 3px rgba(46,116,181,0.15)}
+.row-btns{display:flex;gap:10px;margin-top:4px}
+button{flex:1;padding:13px;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;-webkit-appearance:none}
+.btn-primary{background:#2E74B5;color:#fff}
+.btn-primary:hover,.btn-primary:active{background:#1a5a8a}
+.btn-outline{background:#f0f4f8;color:#555;font-size:13px;font-weight:500}
+.btn-outline:hover,.btn-outline:active{background:#e0e7ee}
+.badge-row{margin-top:10px}
+.badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;margin-right:6px;margin-bottom:4px}
+.low{background:#e8f5e9;color:#2e7d32}
+.mid{background:#fff3e0;color:#e65100}
+.high{background:#fce4ec;color:#c62828}
+.blue-badge{background:#e3f2fd;color:#1565c0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.stat{background:#f8f9fb;border-radius:10px;padding:12px 8px;text-align:center}
+.stat .v{font-size:20px;font-weight:700;color:#0B2545}
+.stat .l{font-size:11px;color:#888;margin-top:2px}
+.stat .euro::before{content:"\20AC";font-size:13px}
+.stat.highlight{background:#e8eef5;border:1.5px solid #2E74B5}
+.stat.highlight .v{color:#c62828;font-size:22px}
+.section-title{font-size:14px;font-weight:600;color:#0B2545;margin:14px 0 6px}
+.steps{background:#f8f9fb;border-radius:10px;padding:12px 14px;font-size:12px;line-height:1.9;margin-top:8px}
+.steps b{color:#0B2545}
+.steps .hl{color:#2E74B5}
+.steps .big{color:#c62828;font-size:15px;font-weight:700}
+table{width:100%;border-collapse:collapse;margin-top:8px;font-size:12px}
+th{background:#2E74B5;color:#fff;padding:8px 8px;text-align:left;font-weight:600;font-size:11px}
+td{padding:6px 8px;border-bottom:1px solid #eee}
+tr:nth-child(even) td{background:#f8f9fb}
+.num{text-align:right}
+.bar-wrap{height:14px;background:#eee;border-radius:4px;overflow:hidden}
+.bar{height:100%;border-radius:4px;background:#2E74B5;min-width:2px}
+.footnote{font-size:11px;color:#999;margin-top:12px;line-height:1.6}
+.presets{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.preset-btn{padding:6px 14px;border:1.5px solid #ddd;border-radius:20px;font-size:12px;background:#fff;cursor:pointer;color:#555}
+.preset-btn:active{background:#e8eef5;border-color:#2E74B5}
+
+  .pw-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#0B2545,#1a5276);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:Calibri,sans-serif}
+  .pw-box{background:#fff;border-radius:16px;padding:32px 28px;width:88%;max-width:360px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.3)}
+  .pw-box h2{color:#0B2545;font-size:20px;margin-bottom:4px}
+  .pw-box p{color:#888;font-size:13px;margin-bottom:18px}
+  .pw-box input{width:100%;padding:12px 14px;border:1.5px solid #ddd;border-radius:10px;font-size:18px;text-align:center;letter-spacing:4px;margin-bottom:14px}
+  .pw-box input:focus{border-color:#2E74B5;outline:none;box-shadow:0 0 0 3px rgba(46,116,181,0.15)}
+  .pw-box .err{color:#c62828;font-size:12px;display:none;margin-bottom:8px}
+  .pw-box button{width:100%;padding:12px;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;background:#2E74B5;color:#fff}
+  .pw-box button:hover{background:#1a5a8a}
+  .pw-box .icon{font-size:48px;margin-bottom:12px}
+</style>
+</head>
+<body>
+
+<div class=pw-overlay id=pwOverlay>
+  <div class=pw-box>
+    <div class=icon></div>
+    <h2>请输入访问密码</h2>
+    <p>此页面需要密码才能查看</p>
+    <input type=password id=pwInput placeholder=请输入密码 maxlength=20 autofocus>
+    <div class=err id=pwErr>密码错误，请重试</div>
+    <button onclick=checkPw()>确认</button>
+  </div>
+</div>
+<script>
+function checkPw(){
+  var p=document.getElementById('pwInput').value;
+  if(p==='0818'){
+    document.getElementById('pwOverlay').style.display='none';
+    document.getElementById('pwInput').blur();
+  } else {
+    document.getElementById('pwErr').style.display='block';
+    document.getElementById('pwInput').value='';
+    document.getElementById('pwInput').focus();
+  }
+}
+document.getElementById('pwInput').addEventListener('keydown',function(e){if(e.key==='Enter')checkPw()});
+</script>
+
+<div class="container">
+
+<div class="card">
+<h1> 餐饮投资计算器</h1>
+<div class="sub">输入客单价 &rarr; 反推投资总额 &middot; EU市场模型</div>
+<div class="presets">
+  <button class="preset-btn" onclick="setPreset(15,'')">低档 €15</button>
+  <button class="preset-btn" onclick="setPreset(40,'')">中档 €40</button>
+  <button class="preset-btn" onclick="setPreset(120,'')">高档 €120</button>
+  <button class="preset-btn" onclick="setPreset(40,'150')">Bistro €40/150㎡</button>
+</div>
+<div class="field">
+<label>人均消费（&euro;）</label>
+<input type="number" id="price" value="40" min="5" max="500" step="1" inputmode="decimal">
+</div>
+<div class="field">
+<label>餐厅面积（&darr; 留空自动按档次默认）</label>
+<input type="number" id="area" placeholder="例如 150" min="10" max="5000" step="10" inputmode="numeric">
+</div>
+<div class="row-btns">
+<button class="btn-primary" onclick="calc()">计算</button>
+<button class="btn-outline" onclick="resetForm()">清空</button>
+</div>
+<div class="badge-row" id="badgeRow"></div>
+</div>
+
+<div class="card" id="resultCard" style="display:none">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
+<span class="section-title" style="margin:0">投资总览</span>
+<span id="tierLabel" style="font-size:12px;font-weight:600"></span>
+</div>
+<div class="grid" id="overviewGrid"></div>
+
+<div class="section-title">推算过程</div>
+<div class="steps" id="stepsDiv"></div>
+
+<div class="section-title">资金分配明细</div>
+<table><thead><tr><th>投入板块</th><th style="text-align:center">占比</th><th style="text-align:right">金额</th><th style="width:30%"></th></tr></thead>
+<tbody id="investBody"></tbody></table>
+<div class="footnote">* 模型估算值，实际请加15-20%预备金。</div>
+</div>
+
+</div>
+
+<script>
+var MODELS = {
+low:{label:"低档 - Fast Casual",cls:"low",range:[5,25],defArea:80,dPct:0.58,sDen:1.7,turn:3.0,oW:0.60,oE:0.80,marg:0.16,pay:15,
+inv:[{n:"硬装施工",p:42},{n:"厨房设备",p:20},{n:"家具软装",p:12},{n:"暖通空调",p:10},{n:"消防安防",p:6},{n:"设计费",p:4},{n:"许可法律",p:4},{n:"开办费",p:5},{n:"智能设备",p:3}]},
+mid:{label:"中档 - Bistro/Brasserie",cls:"mid",range:[25,65],defArea:150,dPct:0.52,sDen:2.3,turn:2.0,oW:0.65,oE:0.85,marg:0.20,pay:24,
+inv:[{n:"硬装施工",p:37},{n:"厨房设备",p:17},{n:"家具软装",p:15},{n:"灯光音响",p:4},{n:"暖通空调",p:11},{n:"消防安防",p:6},{n:"设计费",p:9},{n:"许可法律",p:4},{n:"开办费",p:6},{n:"智能设备",p:4}]},
+high:{label:"高档 - Fine Dining",cls:"high",range:[65,999],defArea:260,dPct:0.48,sDen:3.5,turn:1.5,oW:0.55,oE:0.80,marg:0.22,pay:30,
+inv:[{n:"硬装施工",p:32},{n:"厨房设备",p:14},{n:"家具软装",p:22},{n:"灯光音响",p:7},{n:"暖通空调",p:11},{n:"消防安防",p:6},{n:"设计费",p:12},{n:"许可法律",p:2},{n:"开办费",p:6},{n:"智能设备",p:4}]}
+};
+
+function getM(p){for(var k in MODELS){var m=MODELS[k];if(p>=m.range[0]&&p<=m.range[1])return m}return MODELS.high}
+function fm(n){return'\u20ac'+Math.round(n).toLocaleString()}
+
+function setPreset(p,a){document.getElementById('price').value=p;document.getElementById('area').value=a;calc()}
+function resetForm(){document.getElementById('price').value=40;document.getElementById('area').value='';document.getElementById('resultCard').style.display='none';document.getElementById('badgeRow').innerHTML=''}
+
+function calc(){
+var p=parseFloat(document.getElementById('price').value)||40;var aI=document.getElementById('area').value;var m=getM(p);var a=aI?parseFloat(aI):m.defArea;
+var b='<span class="badge '+m.cls+'">'+m.label+' . 客单价 \u20ac'+p+'</span>';if(aI)b+='<span class="badge blue-badge">面积 '+a+'\u33a1</span>'
+document.getElementById('badgeRow').innerHTML=b;
+var dA=a*m.dPct;var s=Math.floor(dA/m.sDen);var bS=m.pay>=24?4:0;var tS=s+bS;
+var dW=tS*m.turn*m.oW,dE=tS*m.turn*m.oE;var mC=Math.round(dW*22+dE*8);var mR=mC*p,aR=mR*12,mP=mR*m.marg;
+var tI=Math.round(mP*m.pay);var pS=Math.round(tI/a);
+document.getElementById('resultCard').style.display='block';
+document.getElementById('tierLabel').textContent=(m.cls==='low'?'\uD83D\uDD35':m.cls==='mid'?'\uD83D\uDFE1':'\uD83D\uDD34')+' '+m.label;
+document.getElementById('overviewGrid').innerHTML=
+'<div class="stat"><div class="v">'+a+'\u33a1</div><div class="l">面积</div></div>'+
+'<div class="stat"><div class="v">'+tS+'</div><div class="l">座位</div></div>'+
+'<div class="stat"><div class="v">'+mC.toLocaleString()+'</div><div class="l">月客流</div></div>'+
+'<div class="stat"><div class="v">'+fm(mR)+'</div><div class="l">月营收</div></div>'+
+'<div class="stat"><div class="v">'+fm(mP)+'</div><div class="l">月净利</div></div>'+
+'<div class="stat highlight"><div class="v">'+fm(tI)+'</div><div class="l">总投资</div></div>'+
+'<div class="stat"><div class="v">\u20ac'+pS.toLocaleString()+'</div><div class="l">\u33a1造价</div></div>'+
+'<div class="stat"><div class="v">'+m.pay+'月</div><div class="l">回本周期</div></div>';
+document.getElementById('stepsDiv').innerHTML=
+'<div>1. 就餐区 = '+a+'\u33a1 x '+(m.dPct*100).toFixed(0)+'% = <b>'+dA.toFixed(1)+'\u33a1</b></div>'+
+'<div>2. 座位 = '+dA.toFixed(1)+'\u33a1 \u00f7 '+m.sDen+'\u33a1/座 + 吧台'+bS+'座 = <b>'+tS+'座</b></div>'+
+'<div>3. 日均客流 = '+tS+'座 x '+m.turn+'次 = 平日'+Math.round(dW)+'人/周末'+Math.round(dE)+'人</div>'+
+'<div>4. 月营收 = '+mC.toLocaleString()+'人 x \u20ac'+p+' = <span class="hl">'+fm(mR)+'</span></div>'+
+'<div>5. 月净利 = '+fm(mR)+' x '+(m.marg*100).toFixed(0)+'% = <span class="hl">'+fm(mP)+'</span></div>'+
+'<div><b>6. 总投资 = '+fm(mP)+' x '+m.pay+'月 = <span class="big">'+fm(tI)+'</span></b></div>'+
+'<div>7. 单价 = '+fm(tI)+' / '+a+'\u33a1 = <b>\u20ac'+pS.toLocaleString()+'/\u33a1</b></div>';
+var tb='';for(var i=0;i<m.inv.length;i++){var it=m.inv[i],amt=Math.round(tI*it.p/100);
+tb+='<tr><td>'+it.n+'</td><td style="text-align:center">'+it.p+'%</td><td class="num">'+fm(amt)+'</td>'+
+'<td><div class="bar-wrap"><div class="bar" style="width:'+(it.p*2.5)+'px"></div></div></td></tr>'}
+tb+='<tr style="font-weight:700;background:#e8eef5"><td>合计</td><td style="text-align:center">100%</td><td class="num">'+fm(tI)+'</td><td></td></tr>';
+document.getElementById('investBody').innerHTML=tb;
+}
+calc();
+</script>
+</body>
+</html><div class="pw-overlay" id="pwOverlay" style="display:none">
+  <div class="pw-box">
+    <div class="icon">🔒</div>
+    <h2>免费次数已用完</h2>
+    <p id="pwMsg">请联系作者获取访问权限</p>
+    <input type="password" id="pwInput" placeholder="请输入密码" maxlength="20" autofocus>
+    <div class="err" id="pwErr">密码错误，请重试</div>
+    <button onclick="checkPw()">确认</button>
+    <p style="margin-top:18px;font-size:13px;color:#888">作者微信：15090575676</p>
+  </div>
+</div>﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.5,user-scalable=yes">
+<title>欧洲餐饮投资计算器</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Calibri,sans-serif;background:#f0f2f5;color:#333;padding:12px}
+.container{max-width:500px;margin:0 auto}
+.card{background:#fff;border-radius:14px;box-shadow:0 1px 8px rgba(0,0,0,0.07);padding:20px;margin-bottom:14px}
+h1{font-size:20px;color:#0B2545;margin-bottom:2px;letter-spacing:-0.3px}
+.sub{color:#888;font-size:12px;margin-bottom:16px}
+.field{margin-bottom:12px}
+label{display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:4px}
+input{width:100%;padding:12px 14px;border:1.5px solid #ddd;border-radius:10px;font-size:16px;-webkit-appearance:none;appearance:none}
+input:focus{border-color:#2E74B5;outline:none;box-shadow:0 0 0 3px rgba(46,116,181,0.15)}
+.row-btns{display:flex;gap:10px;margin-top:4px}
+button{flex:1;padding:13px;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;-webkit-appearance:none}
+.btn-primary{background:#2E74B5;color:#fff}
+.btn-primary:hover,.btn-primary:active{background:#1a5a8a}
+.btn-outline{background:#f0f4f8;color:#555;font-size:13px;font-weight:500}
+.btn-outline:hover,.btn-outline:active{background:#e0e7ee}
+.badge-row{margin-top:10px}
+.badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;margin-right:6px;margin-bottom:4px}
+.low{background:#e8f5e9;color:#2e7d32}
+.mid{background:#fff3e0;color:#e65100}
+.high{background:#fce4ec;color:#c62828}
+.blue-badge{background:#e3f2fd;color:#1565c0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.stat{background:#f8f9fb;border-radius:10px;padding:12px 8px;text-align:center}
+.stat .v{font-size:20px;font-weight:700;color:#0B2545}
+.stat .l{font-size:11px;color:#888;margin-top:2px}
+.stat .euro::before{content:"\20AC";font-size:13px}
+.stat.highlight{background:#e8eef5;border:1.5px solid #2E74B5}
+.stat.highlight .v{color:#c62828;font-size:22px}
+.section-title{font-size:14px;font-weight:600;color:#0B2545;margin:14px 0 6px}
+.steps{background:#f8f9fb;border-radius:10px;padding:12px 14px;font-size:12px;line-height:1.9;margin-top:8px}
+.steps b{color:#0B2545}
+.steps .hl{color:#2E74B5}
+.steps .big{color:#c62828;font-size:15px;font-weight:700}
+table{width:100%;border-collapse:collapse;margin-top:8px;font-size:12px}
+th{background:#2E74B5;color:#fff;padding:8px 8px;text-align:left;font-weight:600;font-size:11px}
+td{padding:6px 8px;border-bottom:1px solid #eee}
+tr:nth-child(even) td{background:#f8f9fb}
+.num{text-align:right}
+.bar-wrap{height:14px;background:#eee;border-radius:4px;overflow:hidden}
+.bar{height:100%;border-radius:4px;background:#2E74B5;min-width:2px}
+.footnote{font-size:11px;color:#999;margin-top:12px;line-height:1.6}
+.presets{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.preset-btn{padding:6px 14px;border:1.5px solid #ddd;border-radius:20px;font-size:12px;background:#fff;cursor:pointer;color:#555}
+.preset-btn:active{background:#e8eef5;border-color:#2E74B5}
+
+  .pw-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#0B2545,#1a5276);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:Calibri,sans-serif}
+  .pw-box{background:#fff;border-radius:16px;padding:32px 28px;width:88%;max-width:360px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.3)}
+  .pw-box h2{color:#0B2545;font-size:20px;margin-bottom:4px}
+  .pw-box p{color:#888;font-size:13px;margin-bottom:18px}
+  .pw-box input{width:100%;padding:12px 14px;border:1.5px solid #ddd;border-radius:10px;font-size:18px;text-align:center;letter-spacing:4px;margin-bottom:14px}
+  .pw-box input:focus{border-color:#2E74B5;outline:none;box-shadow:0 0 0 3px rgba(46,116,181,0.15)}
+  .pw-box .err{color:#c62828;font-size:12px;display:none;margin-bottom:8px}
+  .pw-box button{width:100%;padding:12px;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;background:#2E74B5;color:#fff}
+  .pw-box button:hover{background:#1a5a8a}
+  .pw-box .icon{font-size:48px;margin-bottom:12px}
+</style>
+</head>
+<body>
+
+<div class=pw-overlay id=pwOverlay>
+  <div class=pw-box>
+    <div class=icon></div>
+    <h2>请输入访问密码</h2>
+    <p>此页面需要密码才能查看</p>
+    <input type=password id=pwInput placeholder=请输入密码 maxlength=20 autofocus>
+    <div class=err id=pwErr>密码错误，请重试</div>
+    <button onclick=checkPw()>确认</button>
+  </div>
+</div>
+<script>
+(function(){
+  var c = parseInt(localStorage.getItem("calc_v") || "0", 10);
+  c++;
+  localStorage.setItem("calc_v", c);
+  if (c <= 2) {
+    document.getElementById("pwOverlay").style.display = "none";
+  } else {
+    document.getElementById("pwOverlay").style.display = "flex";
+  }
+})();
+function checkPw(){
+  var p = document.getElementById("pwInput").value;
+  if (p === "0818"){
+    document.getElementById("pwOverlay").style.display = "none";
+    document.getElementById("pwInput").blur();
+    localStorage.removeItem("calc_v");
+  } else {
+    document.getElementById("pwErr").style.display = "block";
+    document.getElementById("pwInput").value = "";
+    document.getElementById("pwInput").focus();
+  }
+}
+document.getElementById("pwInput").addEventListener("keydown",function(e){if(e.key==="Enter")checkPw()});
+</script>
+
+<div class="container">
+
+<div class="card">
+<h1> 餐饮投资计算器</h1>
+<div class="sub">输入客单价 &rarr; 反推投资总额 &middot; EU市场模型</div>
+<div class="presets">
+  <button class="preset-btn" onclick="setPreset(15,'')">低档 €15</button>
+  <button class="preset-btn" onclick="setPreset(40,'')">中档 €40</button>
+  <button class="preset-btn" onclick="setPreset(120,'')">高档 €120</button>
+  <button class="preset-btn" onclick="setPreset(40,'150')">Bistro €40/150㎡</button>
+</div>
+<div class="field">
+<label>人均消费（&euro;）</label>
+<input type="number" id="price" value="40" min="5" max="500" step="1" inputmode="decimal">
+</div>
+<div class="field">
+<label>餐厅面积（&darr; 留空自动按档次默认）</label>
+<input type="number" id="area" placeholder="例如 150" min="10" max="5000" step="10" inputmode="numeric">
+</div>
+<div class="row-btns">
+<button class="btn-primary" onclick="calc()">计算</button>
+<button class="btn-outline" onclick="resetForm()">清空</button>
+</div>
+<div class="badge-row" id="badgeRow"></div>
+</div>
+
+<div class="card" id="resultCard" style="display:none">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
+<span class="section-title" style="margin:0">投资总览</span>
+<span id="tierLabel" style="font-size:12px;font-weight:600"></span>
+</div>
+<div class="grid" id="overviewGrid"></div>
+
+<div class="section-title">推算过程</div>
+<div class="steps" id="stepsDiv"></div>
+
+<div class="section-title">资金分配明细</div>
+<table><thead><tr><th>投入板块</th><th style="text-align:center">占比</th><th style="text-align:right">金额</th><th style="width:30%"></th></tr></thead>
+<tbody id="investBody"></tbody></table>
+<div class="footnote">* 模型估算值，实际请加15-20%预备金。</div>
+</div>
+
+</div>
+
+<script>
+var MODELS = {
+low:{label:"低档 - Fast Casual",cls:"low",range:[5,25],defArea:80,dPct:0.58,sDen:1.7,turn:3.0,oW:0.60,oE:0.80,marg:0.16,pay:15,
+inv:[{n:"硬装施工",p:42},{n:"厨房设备",p:20},{n:"家具软装",p:12},{n:"暖通空调",p:10},{n:"消防安防",p:6},{n:"设计费",p:4},{n:"许可法律",p:4},{n:"开办费",p:5},{n:"智能设备",p:3}]},
+mid:{label:"中档 - Bistro/Brasserie",cls:"mid",range:[25,65],defArea:150,dPct:0.52,sDen:2.3,turn:2.0,oW:0.65,oE:0.85,marg:0.20,pay:24,
+inv:[{n:"硬装施工",p:37},{n:"厨房设备",p:17},{n:"家具软装",p:15},{n:"灯光音响",p:4},{n:"暖通空调",p:11},{n:"消防安防",p:6},{n:"设计费",p:9},{n:"许可法律",p:4},{n:"开办费",p:6},{n:"智能设备",p:4}]},
+high:{label:"高档 - Fine Dining",cls:"high",range:[65,999],defArea:260,dPct:0.48,sDen:3.5,turn:1.5,oW:0.55,oE:0.80,marg:0.22,pay:30,
+inv:[{n:"硬装施工",p:32},{n:"厨房设备",p:14},{n:"家具软装",p:22},{n:"灯光音响",p:7},{n:"暖通空调",p:11},{n:"消防安防",p:6},{n:"设计费",p:12},{n:"许可法律",p:2},{n:"开办费",p:6},{n:"智能设备",p:4}]}
+};
+
+function getM(p){for(var k in MODELS){var m=MODELS[k];if(p>=m.range[0]&&p<=m.range[1])return m}return MODELS.high}
+function fm(n){return'\u20ac'+Math.round(n).toLocaleString()}
+
+function setPreset(p,a){document.getElementById('price').value=p;document.getElementById('area').value=a;calc()}
+function resetForm(){document.getElementById('price').value=40;document.getElementById('area').value='';document.getElementById('resultCard').style.display='none';document.getElementById('badgeRow').innerHTML=''}
+
+function calc(){
+var p=parseFloat(document.getElementById('price').value)||40;var aI=document.getElementById('area').value;var m=getM(p);var a=aI?parseFloat(aI):m.defArea;
+var b='<span class="badge '+m.cls+'">'+m.label+' . 客单价 \u20ac'+p+'</span>';if(aI)b+='<span class="badge blue-badge">面积 '+a+'\u33a1</span>'
+document.getElementById('badgeRow').innerHTML=b;
+var dA=a*m.dPct;var s=Math.floor(dA/m.sDen);var bS=m.pay>=24?4:0;var tS=s+bS;
+var dW=tS*m.turn*m.oW,dE=tS*m.turn*m.oE;var mC=Math.round(dW*22+dE*8);var mR=mC*p,aR=mR*12,mP=mR*m.marg;
+var tI=Math.round(mP*m.pay);var pS=Math.round(tI/a);
+document.getElementById('resultCard').style.display='block';
+document.getElementById('tierLabel').textContent=(m.cls==='low'?'\uD83D\uDD35':m.cls==='mid'?'\uD83D\uDFE1':'\uD83D\uDD34')+' '+m.label;
+document.getElementById('overviewGrid').innerHTML=
+'<div class="stat"><div class="v">'+a+'\u33a1</div><div class="l">面积</div></div>'+
+'<div class="stat"><div class="v">'+tS+'</div><div class="l">座位</div></div>'+
+'<div class="stat"><div class="v">'+mC.toLocaleString()+'</div><div class="l">月客流</div></div>'+
+'<div class="stat"><div class="v">'+fm(mR)+'</div><div class="l">月营收</div></div>'+
+'<div class="stat"><div class="v">'+fm(mP)+'</div><div class="l">月净利</div></div>'+
+'<div class="stat highlight"><div class="v">'+fm(tI)+'</div><div class="l">总投资</div></div>'+
+'<div class="stat"><div class="v">\u20ac'+pS.toLocaleString()+'</div><div class="l">\u33a1造价</div></div>'+
+'<div class="stat"><div class="v">'+m.pay+'月</div><div class="l">回本周期</div></div>';
+document.getElementById('stepsDiv').innerHTML=
+'<div>1. 就餐区 = '+a+'\u33a1 x '+(m.dPct*100).toFixed(0)+'% = <b>'+dA.toFixed(1)+'\u33a1</b></div>'+
+'<div>2. 座位 = '+dA.toFixed(1)+'\u33a1 \u00f7 '+m.sDen+'\u33a1/座 + 吧台'+bS+'座 = <b>'+tS+'座</b></div>'+
+'<div>3. 日均客流 = '+tS+'座 x '+m.turn+'次 = 平日'+Math.round(dW)+'人/周末'+Math.round(dE)+'人</div>'+
+'<div>4. 月营收 = '+mC.toLocaleString()+'人 x \u20ac'+p+' = <span class="hl">'+fm(mR)+'</span></div>'+
+'<div>5. 月净利 = '+fm(mR)+' x '+(m.marg*100).toFixed(0)+'% = <span class="hl">'+fm(mP)+'</span></div>'+
+'<div><b>6. 总投资 = '+fm(mP)+' x '+m.pay+'月 = <span class="big">'+fm(tI)+'</span></b></div>'+
+'<div>7. 单价 = '+fm(tI)+' / '+a+'\u33a1 = <b>\u20ac'+pS.toLocaleString()+'/\u33a1</b></div>';
+var tb='';for(var i=0;i<m.inv.length;i++){var it=m.inv[i],amt=Math.round(tI*it.p/100);
+tb+='<tr><td>'+it.n+'</td><td style="text-align:center">'+it.p+'%</td><td class="num">'+fm(amt)+'</td>'+
+'<td><div class="bar-wrap"><div class="bar" style="width:'+(it.p*2.5)+'px"></div></div></td></tr>'}
+tb+='<tr style="font-weight:700;background:#e8eef5"><td>合计</td><td style="text-align:center">100%</td><td class="num">'+fm(tI)+'</td><td></td></tr>';
+document.getElementById('investBody').innerHTML=tb;
+}
+calc();
+</script>
+</body>
+</html>
