@@ -34,12 +34,6 @@ tr:nth-child(even) td{background:#f8f9fb}
 .presets{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
 .preset-btn{padding:6px 14px;border:1.5px solid #ddd;border-radius:20px;font-size:12px;cursor:pointer}
 footer{text-align:center;font-size:12px;color:#888;padding:20px 0}
-input:focus{border-color:#2E74B5;outline:none;box-shadow:0 0 0 3px rgba(46,116,181,0.15)}
-.badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;margin:4px 6px 4px 0}
-.low{background:#e8f5e9;color:#2e7d32}.mid{background:#fff3e0;color:#e65100}.high{background:#fce4ec;color:#c62828}
-.steps .hl{color:#2E74B5}.steps .big{color:#c62828;font-size:15px;font-weight:700}
-.presets{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
-.preset-btn{cursor:pointer}
 </style>
 </head><body>
 <div class="container">
@@ -123,22 +117,22 @@ document.getElementById('overviewGrid').innerHTML=
   c++;
   try { localStorage.setItem('calc_v', c); } catch(e) {}
   if (c <= 2) {
-    var el = document.getElementById('pwOverlay');
+    var el = document.getElementById('removed');
     if (el) el.style.display = 'none';
   } else {
-    var el = document.getElementById('pwOverlay');
+    var el = document.getElementById('removed');
     if (el) el.style.display = 'flex';
   }
 })();
-function checkPw(){
-  var p = document.getElementById('pwInput').value;
+function removed(){
+  var p = document.getElementById('removed').value;
   if (p === '0818'){
-    document.getElementById('pwOverlay').style.display = 'none';
+    document.getElementById('removed').style.display = 'none';
     try { localStorage.removeItem('calc_v'); } catch(e) {}
   } else {
     document.getElementById('pwErr').style.display = 'block';
-    document.getElementById('pwInput').value = '';
-    document.getElementById('pwInput').focus();
+    document.getElementById('removed').value = '';
+    document.getElementById('removed').focus();
   }
 }
 </script>
