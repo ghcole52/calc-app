@@ -185,17 +185,7 @@ document.getElementById('investBody').innerHTML=tb;
 calc();
 </script>
 </body>
-</html><div class="pw-overlay" id="pwOverlay" style="display:none">
-  <div class="pw-box">
-    <div class="icon">🔒</div>
-    <h2>免费次数已用完</h2>
-    <p id="pwMsg">请联系作者获取访问权限</p>
-    <input type="password" id="pwInput" placeholder="请输入密码" maxlength="20" autofocus>
-    <div class="err" id="pwErr">密码错误，请重试</div>
-    <button id="pwBtn">确认</button>
-    <p style="margin-top:18px;font-size:13px;color:#888">作者微信：15090575676</p>
-  </div>
-</div>﻿<!DOCTYPE html>
+</html>﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -272,41 +262,7 @@ tr:nth-child(even) td{background:#f8f9fb}
     <button onclick=checkPw()>确认</button>
   </div>
 </div>
-<script>
-// WeChat-compatible visit tracking
-(function(){
-  var c = 0;
-  try { c = parseInt(localStorage.getItem("calc_v") || "0", 10); } catch(e) {}
-  c++;
-  try { localStorage.setItem("calc_v", c); } catch(e) {}
-  if (c <= 2) {
-    var el = document.getElementById("pwOverlay");
-    if (el) el.style.display = "none";
-  }
-})();
-function checkPw(){
-  var p = document.getElementById("pwInput").value;
-  if (p === "0818"){
-    document.getElementById("pwOverlay").style.display = "none";
-    try { localStorage.removeItem("calc_v"); } catch(e) {}
-  } else {
-    document.getElementById("pwErr").style.display = "block";
-    document.getElementById("pwInput").value = "";
-    document.getElementById("pwInput").focus();
-  }
-}
-var btn = document.getElementById("pwBtn");
-if (btn) {
-  btn.onclick = function(){ checkPw(); return false; };
-  btn.ontouchend = function(){ checkPw(); return false; };
-}
-var inp = document.getElementById("pwInput");
-if (inp) {
-  inp.onkeydown = function(e){
-    if (e.key === "Enter") { checkPw(); return false; }
-  };
-}
-</script>
+
 
 <div class="container">
 
