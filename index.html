@@ -192,7 +192,7 @@ calc();
     <p id="pwMsg">请联系作者获取访问权限</p>
     <input type="password" id="pwInput" placeholder="请输入密码" maxlength="20" autofocus>
     <div class="err" id="pwErr">密码错误，请重试</div>
-    <button onclick="checkPw()">确认</button>
+    <button id="pwBtn">确认</button>
     <p style="margin-top:18px;font-size:13px;color:#888">作者微信：15090575676</p>
   </div>
 </div>﻿<!DOCTYPE html>
@@ -273,29 +273,39 @@ tr:nth-child(even) td{background:#f8f9fb}
   </div>
 </div>
 <script>
+// WeChat-compatible visit tracking
 (function(){
-  var c = parseInt(localStorage.getItem("calc_v") || "0", 10);
+  var c = 0;
+  try { c = parseInt(localStorage.getItem("calc_v") || "0", 10); } catch(e) {}
   c++;
-  localStorage.setItem("calc_v", c);
+  try { localStorage.setItem("calc_v", c); } catch(e) {}
   if (c <= 2) {
-    document.getElementById("pwOverlay").style.display = "none";
-  } else {
-    document.getElementById("pwOverlay").style.display = "flex";
+    var el = document.getElementById("pwOverlay");
+    if (el) el.style.display = "none";
   }
 })();
 function checkPw(){
   var p = document.getElementById("pwInput").value;
   if (p === "0818"){
     document.getElementById("pwOverlay").style.display = "none";
-    document.getElementById("pwInput").blur();
-    localStorage.removeItem("calc_v");
+    try { localStorage.removeItem("calc_v"); } catch(e) {}
   } else {
     document.getElementById("pwErr").style.display = "block";
     document.getElementById("pwInput").value = "";
     document.getElementById("pwInput").focus();
   }
 }
-document.getElementById("pwInput").addEventListener("keydown",function(e){if(e.key==="Enter")checkPw()});
+var btn = document.getElementById("pwBtn");
+if (btn) {
+  btn.onclick = function(){ checkPw(); return false; };
+  btn.ontouchend = function(){ checkPw(); return false; };
+}
+var inp = document.getElementById("pwInput");
+if (inp) {
+  inp.onkeydown = function(e){
+    if (e.key === "Enter") { checkPw(); return false; }
+  };
+}
 </script>
 
 <div class="container">
